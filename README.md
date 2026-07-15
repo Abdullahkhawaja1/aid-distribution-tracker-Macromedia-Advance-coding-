@@ -17,6 +17,8 @@ polymorphism, modules/packages, JSON, serialization, and SQLite with Python.
 - Export/import data as **JSON**, and take full database **backups**
 - All data persisted in **SQLite**
 
+<img width="3356" height="1718" alt="image" src="https://github.com/user-attachments/assets/91fa424e-6a9d-464d-aaf9-32e906ef4c3f" />
+
 ## Course concepts demonstrated
 
 | Concept | Where |
