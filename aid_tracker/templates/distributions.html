@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Distributions{% endblock %}
+{% block page_title %}Distribution Records{% endblock %}
+{% block page_meta %}<span class="mono">{{ distributions|length }} hand-offs</span>{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Log a distribution</h2>
+    <span class="panel-sub mono">confirm aid reached a beneficiary</span>
+  </div>
+
+  {% if shipments and beneficiaries %}
+  <form method="POST" action="{{ url_for('distributions_add') }}" class="form-grid">
+    <div class="field">
+      <label>Shipment</label>
+      <select name="shipment_id" required>
+        {% for s in shipments %}
+          <option value="{{ s.shipment_id }}">{{ s.shipment_id }} — {{ s.origin }} → {{ s.destination }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Beneficiary</label>
+      <select name="beneficiary_id" required>
+        {% for b in beneficiaries %}
+          <option value="{{ b.beneficiary_id }}">{{ b.beneficiary_id }} — {{ b.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Quantity delivered</label>
+      <input type="number" step="0.01" name="quantity_delivered" required placeholder="e.g. 25">
+    </div>
+    <div class="field field-wide">
+      <label>Notes</label>
+      <input type="text" name="notes" placeholder="optional">
+    </div>
+    <button type="submit" class="btn-primary">Record distribution</button>
+  </form>
+  {% else %}
+    <p class="empty-state">
+      You need at least one shipment and one beneficiary before logging a distribution.
+      <a href="{{ url_for('shipments_list') }}">Add a shipment</a> ·
+      <a href="{{ url_for('beneficiaries_list') }}">Add a beneficiary</a>
+    </p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>All distribution records</h2>
+  </div>
+  {% if distributions %}
+  <table class="manifest-table">
+    <thead>
+      <tr><th>Record</th><th>Shipment</th><th>Beneficiary</th><th>Qty delivered</th><th>Date</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      {% for d in distributions %}
+      <tr>
+        <td class="mono">{{ d.record_id }}</td>
+        <td class="mono">{{ d.shipment_id }}</td>
+        <td class="mono">{{ d.beneficiary_id }}</td>
+        <td>{{ d.quantity_delivered }}</td>
+        <td>{{ d.delivered_on }}</td>
+        <td class="text-muted">{{ d.notes or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="empty-state">No distributions logged yet.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

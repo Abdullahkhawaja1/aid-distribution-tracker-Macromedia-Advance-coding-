@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Data & Backup{% endblock %}
+{% block page_title %}Data &amp; Backup{% endblock %}
+{% block page_meta %}<span class="mono">JSON persistence layer</span>{% endblock %}
+
+{% block content %}
+
+<section class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Export</h2>
+      <span class="panel-sub mono">download as JSON</span>
+    </div>
+    <p class="text-muted">Export current records to JSON — useful for field teams working offline, or for sharing data between NGOs.</p>
+    <div class="button-row">
+      <a class="btn-secondary" href="{{ url_for('data_export', kind='beneficiaries') }}">Export beneficiaries</a>
+      <a class="btn-secondary" href="{{ url_for('data_export', kind='shipments') }}">Export shipments</a>
+      <a class="btn-primary" href="{{ url_for('data_export', kind='backup') }}">Export full backup</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Backup &amp; Restore</h2>
+      <span class="panel-sub mono">full database snapshot</span>
+    </div>
+    <p class="text-muted">A backup captures every beneficiary, shipment, and distribution record as a single timestamped JSON snapshot.</p>
+    <form method="POST" action="{{ url_for('data_backup') }}">
+      <button type="submit" class="btn-primary">Create backup now</button>
+    </form>
+
+    <div class="divider"></div>
+
+    {% if backups %}
+    <form method="POST" action="{{ url_for('data_restore') }}" class="form-grid">
+      <div class="field field-wide">
+        <label>Restore from snapshot</label>
+        <select name="filename">
+          {% for b in backups %}<option value="{{ b }}">{{ b }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-secondary" onclick="return confirm('Restore this snapshot into the live database?');">Restore selected backup</button>
+    </form>
+    {% else %}
+      <p class="empty-state">No backups yet. Create one above.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

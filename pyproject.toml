@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aid-distribution-tracker"
+version = "0.1.0"
+description = "A Python system for tracking aid shipments, beneficiaries, and distribution records for NGOs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Your Name" }
+]
+keywords = ["ngo", "aid", "logistics", "sqlite", "flask", "oop"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Framework :: Flask",
+    "Topic :: Office/Business",
+]
+dependencies = [
+    "Flask>=3.0,<4.0",
+]
+
+[project.scripts]
+aid-tracker = "aid_tracker.app:main"
+
+[project.urls]
+Homepage = "https://github.com/YOUR_USERNAME/aid-distribution-tracker"
+Repository = "https://github.com/YOUR_USERNAME/aid-distribution-tracker"
+
+[tool.setuptools.packages.find]
+include = ["aid_tracker*"]
+
+[tool.setuptools.package-data]
+aid_tracker = ["templates/*.html", "static/css/*.css", "static/js/*.js"]

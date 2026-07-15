@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}ReliefLine{% endblock %} · Aid Distribution Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">RL</div>
+      <div class="brand-text">
+        <span class="brand-name">ReliefLine</span>
+        <span class="brand-sub">Aid Distribution Tracker</span>
+      </div>
+    </div>
+
+    <nav class="nav-manifest">
+      <span class="nav-label">Operations</span>
+      <a href="{{ url_for('dashboard') }}" class="nav-item {{ 'is-active' if request.endpoint == 'dashboard' }}">
+        <span class="nav-tag">01</span> Dashboard
+      </a>
+      <a href="{{ url_for('shipments_list') }}" class="nav-item {{ 'is-active' if request.endpoint and request.endpoint.startswith('shipments') }}">
+        <span class="nav-tag">02</span> Shipments
+      </a>
+      <a href="{{ url_for('beneficiaries_list') }}" class="nav-item {{ 'is-active' if request.endpoint and request.endpoint.startswith('beneficiaries') }}">
+        <span class="nav-tag">03</span> Beneficiaries
+      </a>
+      <a href="{{ url_for('distributions_list') }}" class="nav-item {{ 'is-active' if request.endpoint and request.endpoint.startswith('distributions') }}">
+        <span class="nav-tag">04</span> Distributions
+      </a>
+      <span class="nav-label">System</span>
+      <a href="{{ url_for('data_tools') }}" class="nav-item {{ 'is-active' if request.endpoint and request.endpoint.startswith('data') }}">
+        <span class="nav-tag">05</span> Data &amp; Backup
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="status-dot"></div> Field DB connected
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+      <div class="topbar-meta">{% block page_meta %}{% endblock %}</div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

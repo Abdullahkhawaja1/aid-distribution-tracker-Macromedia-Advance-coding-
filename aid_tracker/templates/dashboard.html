@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Operations Dashboard{% endblock %}
+{% block page_meta %}<span class="mono">{{ shipment_count }} shipments tracked</span>{% endblock %}
+
+{% block content %}
+
+<section class="stat-row">
+  <div class="stat-card">
+    <span class="stat-label">People reached</span>
+    <span class="stat-value">{{ total_people_reached }}</span>
+    <span class="stat-foot">{{ beneficiary_count }} beneficiary records</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Active shipments</span>
+    <span class="stat-value">{{ active_count }}</span>
+    <span class="stat-foot">pending or in transit</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Delivered</span>
+    <span class="stat-value">{{ delivered_count }}</span>
+    <span class="stat-foot">of {{ shipment_count }} total shipments</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Distribution records</span>
+    <span class="stat-value">{{ distribution_count }}</span>
+    <span class="stat-foot">hand-offs logged</span>
+  </div>
+</section>
+
+<section class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Highest-priority shipments</h2>
+      <span class="panel-sub mono">sorted by urgency score</span>
+    </div>
+    {% if critical_shipments %}
+      <table class="manifest-table">
+        <thead>
+          <tr><th>ID</th><th>Route</th><th>NGO</th><th>Priority</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for s in critical_shipments %}
+          <tr>
+            <td class="mono">{{ s.shipment_id }}</td>
+            <td>{{ s.origin }} <span class="arrow">&rarr;</span> {{ s.destination }}</td>
+            <td>{{ s.ngo_name }}</td>
+            <td><span class="priority-pill priority-{{ 'high' if s.total_priority() >= 15 else ('mid' if s.total_priority() >= 7 else 'low') }}">{{ s.total_priority() }}</span></td>
+            <td><span class="stamp stamp-{{ s.status.value|lower }}">{{ s.status.value.replace('_',' ') }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state">No shipments yet. <a href="{{ url_for('shipments_list') }}">Create the first one &rarr;</a></p>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Shipment status</h2>
+      <span class="panel-sub mono">live breakdown</span>
+    </div>
+    <canvas id="statusChart" height="220" data-stats='{{ status_counts | tojson }}'></canvas>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Recent distributions</h2>
+    <span class="panel-sub mono">latest hand-offs</span>
+  </div>
+  {% if recent_distributions %}
+    <table class="manifest-table">
+      <thead>
+        <tr><th>Record</th><th>Shipment</th><th>Beneficiary</th><th>Qty</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for d in recent_distributions %}
+        <tr>
+          <td class="mono">{{ d.record_id }}</td>
+          <td class="mono">{{ d.shipment_id }}</td>
+          <td class="mono">{{ d.beneficiary_id }}</td>
+          <td>{{ d.quantity_delivered }}</td>
+          <td>{{ d.delivered_on }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty-state">No distributions logged yet.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

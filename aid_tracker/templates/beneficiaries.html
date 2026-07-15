@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Beneficiaries{% endblock %}
+{% block page_title %}Beneficiaries{% endblock %}
+{% block page_meta %}<span class="mono">{{ beneficiaries|length }} records</span>{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Register a beneficiary</h2>
+    <span class="panel-sub mono">individual / household / institution</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('beneficiaries_add') }}" class="form-grid" id="beneficiaryForm">
+    <div class="field">
+      <label>Type</label>
+      <select name="type" id="beneficiaryType">
+        <option value="individual">Individual</option>
+        <option value="household">Household</option>
+        <option value="institution">Institution</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" name="name" required placeholder="e.g. Amina Yusuf">
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" name="location" required placeholder="e.g. Zone 4 Camp">
+    </div>
+    <div class="field">
+      <label>Contact</label>
+      <input type="text" name="contact" placeholder="optional">
+    </div>
+
+    <div class="field subtype-field" data-type="individual">
+      <label>Age</label>
+      <input type="number" name="age" min="0">
+    </div>
+    <div class="field subtype-field" data-type="individual">
+      <label>Vulnerability</label>
+      <select name="vulnerability">
+        <option value="general">General</option>
+        <option value="elderly">Elderly</option>
+        <option value="disabled">Disabled</option>
+        <option value="pregnant">Pregnant</option>
+        <option value="unaccompanied_minor">Unaccompanied minor</option>
+      </select>
+    </div>
+
+    <div class="field subtype-field" data-type="household" hidden>
+      <label>Family size</label>
+      <input type="number" name="family_size" min="1" value="1">
+    </div>
+    <div class="field subtype-field checkbox-field" data-type="household" hidden>
+      <label><input type="checkbox" name="has_children"> Has children</label>
+    </div>
+
+    <div class="field subtype-field" data-type="institution" hidden>
+      <label>Institution type</label>
+      <select name="institution_type">
+        <option value="shelter">Shelter</option>
+        <option value="school">School</option>
+        <option value="clinic">Clinic</option>
+        <option value="camp">Camp</option>
+      </select>
+    </div>
+    <div class="field subtype-field" data-type="institution" hidden>
+      <label>Population served</label>
+      <input type="number" name="served_population" min="0">
+    </div>
+
+    <div class="field field-wide">
+      <label>Notes</label>
+      <input type="text" name="notes" placeholder="optional">
+    </div>
+
+    <button type="submit" class="btn-primary">Register beneficiary</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>All beneficiaries</h2>
+  </div>
+  {% if beneficiaries %}
+  <table class="manifest-table">
+    <thead>
+      <tr><th>ID</th><th>Type</th><th>Name</th><th>Location</th><th>Headcount</th><th>Detail</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for b in beneficiaries %}
+      <tr>
+        <td class="mono">{{ b.beneficiary_id }}</td>
+        <td><span class="type-pill type-{{ b.category }}">{{ b.category }}</span></td>
+        <td>{{ b.name }}</td>
+        <td>{{ b.location }}</td>
+        <td>{{ b.headcount() }}</td>
+        <td class="text-muted">{{ b.describe() }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('beneficiaries_delete', beneficiary_id=b.beneficiary_id) }}" onsubmit="return confirm('Remove this record?');">
+            <button type="submit" class="btn-ghost-danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="empty-state">No beneficiaries registered yet.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/beneficiaries.js') }}"></script>
+{% endblock %}

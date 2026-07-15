@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Shipments{% endblock %}
+{% block page_title %}Shipments{% endblock %}
+{% block page_meta %}<span class="mono">{{ shipments|length }} manifests</span>{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Create a shipment</h2>
+    <span class="panel-sub mono">manifest builder</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('shipments_add') }}" class="form-grid">
+    <div class="field">
+      <label>Origin</label>
+      <input type="text" name="origin" required placeholder="e.g. Central Warehouse">
+    </div>
+    <div class="field">
+      <label>Destination</label>
+      <input type="text" name="destination" required placeholder="e.g. Zone 4 Camp">
+    </div>
+    <div class="field">
+      <label>NGO</label>
+      <input type="text" name="ngo_name" required placeholder="e.g. Horizon Relief">
+    </div>
+    <div class="field">
+      <label>Urgency</label>
+      <select name="urgency">
+        <option value="LOW">Low</option>
+        <option value="MODERATE" selected>Moderate</option>
+        <option value="HIGH">High</option>
+        <option value="CRITICAL">Critical</option>
+      </select>
+    </div>
+
+    <div class="field-wide">
+      <label>Cargo items</label>
+      <div id="itemRows" class="item-rows">
+        <div class="item-row">
+          <select name="item_category">
+            {% for cat in item_categories %}<option value="{{ cat }}">{{ cat|capitalize }}</option>{% endfor %}
+          </select>
+          <input type="text" name="item_name" placeholder="Item name, e.g. Rice">
+          <input type="number" step="0.01" name="item_quantity" placeholder="Qty">
+          <input type="text" name="item_unit" placeholder="Unit, e.g. kg">
+          <button type="button" class="btn-ghost-danger remove-row" title="Remove row">&times;</button>
+        </div>
+      </div>
+      <button type="button" id="addItemRow" class="btn-secondary">+ Add cargo line</button>
+    </div>
+
+    <button type="submit" class="btn-primary">Create shipment</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>All shipments</h2>
+  </div>
+  {% if shipments %}
+  <table class="manifest-table">
+    <thead>
+      <tr><th>ID</th><th>Route</th><th>NGO</th><th>Cargo</th><th>Priority</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for s in shipments %}
+      <tr>
+        <td class="mono">{{ s.shipment_id }}</td>
+        <td>{{ s.origin }} <span class="arrow">&rarr;</span> {{ s.destination }}</td>
+        <td>{{ s.ngo_name }}</td>
+        <td class="text-muted">{{ s.item_count() }} line(s)</td>
+        <td><span class="priority-pill priority-{{ 'high' if s.total_priority() >= 15 else ('mid' if s.total_priority() >= 7 else 'low') }}">{{ s.total_priority() }}</span></td>
+        <td><span class="stamp stamp-{{ s.status.value|lower }}">{{ s.status.value.replace('_',' ') }}</span></td>
+        <td class="row-actions">
+          <form method="POST" action="{{ url_for('shipments_update_status', shipment_id=s.shipment_id) }}" class="inline-form">
+            <select name="status" onchange="this.form.submit()">
+              {% for st in statuses %}
+                <option value="{{ st }}" {{ 'selected' if st == s.status.value }}>{{ st.replace('_',' ').title() }}</option>
+              {% endfor %}
+            </select>
+          </form>
+          <form method="POST" action="{{ url_for('shipments_delete', shipment_id=s.shipment_id) }}" onsubmit="return confirm('Remove this shipment?');">
+            <button type="submit" class="btn-ghost-danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="empty-state">No shipments yet.</p>
+  {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shipments.js') }}"></script>
+{% endblock %}
