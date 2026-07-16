@@ -78,6 +78,8 @@ Then open **http://127.0.0.1:5000** in your browser.
 ```bash
 python -m pytest tests/
 ```
+<img width="1650" height="2100" alt="image" src="https://github.com/user-attachments/assets/88aaca24-b648-43b0-99c3-21bfa68a1996" />
+
 
 ## Publishing to PyPI (for the course requirement)
 
